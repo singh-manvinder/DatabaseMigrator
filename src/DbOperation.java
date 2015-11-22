@@ -25,6 +25,7 @@ public class DbOperation {
         Statement stmt=conn.createStatement();
        DatabaseMetaData metadata=conn.getMetaData();
        ResultSet dbname=metadata.getCatalogs();
+       
         try {
                 while(dbname.next())
                 {
@@ -38,6 +39,7 @@ public class DbOperation {
                     
                     else
                     {
+                       
                         System.out.println(db);
                         JCheckBox cb=new JCheckBox(db);
                         dbPanel.add(cb);

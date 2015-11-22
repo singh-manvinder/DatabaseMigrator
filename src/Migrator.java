@@ -42,18 +42,19 @@ public class Migrator {
           // String salary = rs.getString("salary");
            ResultSet tableNames=metadata.getTables(db,null,"%",null);
            System.out.println("db name: "+db);
-           while(tableNames.next())
+           while(tableNames.next()) //migrating tables
            {
+            
                String table=tableNames.getString(3);
                System.out.println("TABLE NAME: "+table);
                String query="create table "+table+"(";
                //stmt_temp.executeUpdate("create table "+table+"_new");
-         
+           
                ResultSet columns=metadata.getColumns(db,null,table,null);
                //System.out.println("checkpoint1");
                boolean check=false;
                int count=0;
-               while(columns.next())
+               while(columns.next())  //migrating columns
                {
                    count++;
                    if(check)
@@ -77,8 +78,29 @@ public class Migrator {
                System.out.print(query);
                stmt_temp.executeUpdate(query);
                
-               ResultSet data=stmt.executeQuery("select * from "+db+"."+table);
+               ResultSet pkey=metadata.getPrimaryKeys(db,null, table);
+               String pKeyColumn="";
+               boolean temp=true;
+                while (pkey.next()) 
+                {
+                    if(temp)
+                        pKeyColumn = pkey.getString("COLUMN_NAME");
+                  
+                    else
+                        pKeyColumn = pKeyColumn+","+pkey.getString("COLUMN_NAME");
+                        
+                    System.out.println("\ngetPrimaryKeys(): columnName=" + pKeyColumn);
+                    temp=false;
+                }
+                if(!pKeyColumn.equals(""))
+                {
+                    String pKeyQuery="ALTER TABLE "+table+" ADD CONSTRAINT PK PRIMARY KEY ("+pKeyColumn+")";
+                    stmt_temp.executeUpdate(pKeyQuery);
+                    System.out.println("pkeyquery:"+pKeyQuery);
+               
+                }                     ResultSet data=stmt.executeQuery("select * from "+db+"."+table);
                ResultSetMetaData metadata_temp= data.getMetaData();
+              
                while(data.next())
                {
             
