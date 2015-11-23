@@ -58,6 +58,7 @@ public class Gui extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         dPort = new javax.swing.JTextField();
         migrate = new javax.swing.JButton();
+        back = new javax.swing.JButton();
         dbPanel = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
 
@@ -197,6 +198,13 @@ public class Gui extends javax.swing.JFrame {
             }
         });
 
+        back.setText("Back");
+        back.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout destPanelLayout = new javax.swing.GroupLayout(destPanel);
         destPanel.setLayout(destPanelLayout);
         destPanelLayout.setHorizontalGroup(
@@ -220,7 +228,9 @@ public class Gui extends javax.swing.JFrame {
                             .addComponent(dPassword))
                         .addContainerGap())))
             .addGroup(destPanelLayout.createSequentialGroup()
-                .addGap(166, 166, 166)
+                .addGap(37, 37, 37)
+                .addComponent(back)
+                .addGap(56, 56, 56)
                 .addGroup(destPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(migrate)
                     .addComponent(jLabel2))
@@ -230,8 +240,10 @@ public class Gui extends javax.swing.JFrame {
             destPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(destPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel2)
-                .addGap(29, 29, 29)
+                .addGroup(destPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addComponent(back))
+                .addGap(20, 20, 20)
                 .addGroup(destPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(dHost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -300,20 +312,27 @@ public class Gui extends javax.swing.JFrame {
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Gui.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(mainPanel,"Unable to make connection with source","Error",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(mainPanel,"Unable to make connection with Source","Error",JOptionPane.ERROR_MESSAGE);
         }
         String destHost=dHost.getText();
         String destPort=dPort.getText();
         String destUser=dUsername.getText();
         String destPass=dPassword.getText();
-        Connection desConn=sourceConn;//= ConnectionProvider.getConnection("mysql",destHost,destUser,destPass,destPort);
-        
-        Migrator mig=new Migrator();
+        Connection desConn = null;
         try {
+            desConn = ConnectionProvider.getConnection("mysql",destUser,destPass,destHost,destPort);
+            Migrator mig=new Migrator();
             mig.migrate(sourceConn, desConn);
-        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(mainPanel,"Data migrated successfully",null,JOptionPane.INFORMATION_MESSAGE);
+    
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(Gui.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            JOptionPane.showMessageDialog(mainPanel,"Unable to make connection with Destination","Error",JOptionPane.ERROR_MESSAGE);
         }
+        
+        
 
     }//GEN-LAST:event_migrateActionPerformed
 
@@ -348,6 +367,11 @@ public class Gui extends javax.swing.JFrame {
     private void dPortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dPortActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_dPortActionPerformed
+
+    private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
+        CardLayout card = (CardLayout)mainPanel.getLayout();
+        card.first(mainPanel);
+    }//GEN-LAST:event_backActionPerformed
 
     /**
      * @param args the command line arguments
@@ -385,6 +409,7 @@ public class Gui extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton back;
     private javax.swing.JTextField dHost;
     private javax.swing.JPasswordField dPassword;
     private javax.swing.JTextField dPort;
