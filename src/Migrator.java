@@ -21,7 +21,7 @@ public class Migrator {
     public void migrate(Connection sourceConn,Connection destConn) throws SQLException
     {
         //Connection conn= ConnectionProvider.getConnection("mysql","root","rockstar","localhost","3306");
-       Statement stmt=sourceConn.createStatement();
+       Statement stmt=destConn.createStatement();
        DatabaseMetaData metadata= sourceConn.getMetaData();
        ResultSet dbname=metadata.getCatalogs();
        while(dbname.next())
@@ -33,10 +33,10 @@ public class Migrator {
            {
                continue;
            }
-           stmt.executeUpdate("create database "+db+"_3;");
-           stmt.executeUpdate("use "+db+"_3;");
+           stmt.executeUpdate("create database "+db+";");
+           stmt.executeUpdate("use "+db+";");
            //Connection conn_temp=DriverManager.getConnection("jdbc:mysql://localhost:3306/"+db,"root","rockstar");
-           Statement stmt_temp=sourceConn.createStatement();
+           Statement stmt_temp=destConn.createStatement();
            
           // String name = rs.getString("name");
           // String salary = rs.getString("salary");
@@ -98,7 +98,10 @@ public class Migrator {
                     stmt_temp.executeUpdate(pKeyQuery);
                     System.out.println("pkeyquery:"+pKeyQuery);
                
-                }                     ResultSet data=stmt.executeQuery("select * from "+db+"."+table);
+                }
+                Statement stmt_source=sourceConn.createStatement();
+                stmt_source.executeQuery("use "+db+";");
+                ResultSet data=stmt_source.executeQuery("select * from "+db+"."+table);
                ResultSetMetaData metadata_temp= data.getMetaData();
               
                while(data.next())
@@ -106,6 +109,8 @@ public class Migrator {
             
                    System.out.println("check1");
                  String insertQuery="insert into "+table+" values(";
+                 System.out.println("count:"+count);
+                 
                     for(int i=1;i<=count;i++)
                     {
                         int colType = metadata_temp.getColumnType(i);
@@ -124,7 +129,7 @@ public class Migrator {
                     } 
                     insertQuery=insertQuery+")";
                     System.out.println(insertQuery);
-                    stmt=sourceConn.createStatement();
+                    stmt=destConn.createStatement();
                     stmt.executeUpdate(insertQuery);
                }
            }
